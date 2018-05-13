@@ -1,5 +1,17 @@
 # depslib dependency file v1.0
-1526180012 source:e:\code\homework_for2018\database\db\main.cpp
+1526187276 source:e:\code\homework_for2018\database\db\main.cpp
 	<iostream>
 	<string>
+	"matrix.h"
+
+1526187815 e:\code\homework_for2018\database\db\matrix.h
+	<algorithm>
+	<memory>
+
+1526184401 e:\code\homework_for2018\database\db\element.h
+	<algorithm>
+	<memory>
+
+1526185733 source:e:\code\homework_for2018\database\db\matrix.cpp
+	"matrix.h"
 
