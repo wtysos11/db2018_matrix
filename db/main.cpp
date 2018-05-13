@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include <cmath>
 #include "heap.h"
+#include <time.h>
 
 #define NUM_N 60000
 #define NUM_D 784
@@ -35,6 +36,23 @@ double countingEuclidDist(Matrix<T>* a,Matrix<T>* b)
     return sqrt(dist);
 }
 
+void knn(Matrix<float>** source,Matrix<float>* aim)
+{
+    clock_t clockBegin,clockEnd;
+    clockBegin = clock();
+    KHeap h(10);
+    for(int i=1;i<NUM_N;i++)
+    {
+        Matrix<float>* mat = source[i];
+        Node ele(mat->getId(),countingEuclidDist(mat,aim));
+        h.insert(ele);
+    }
+    clockEnd = clock();
+    h.printAll();
+    h.printAll2();
+    printf("spend %d ms\n",clockEnd-clockBegin);
+}
+
 int main(void)
 {
 
@@ -47,15 +65,7 @@ int main(void)
     Matrix<float>* last = matrix[n-1];
     last->printAll();
 
-    KHeap h(10);
-    for(int i=1;i<NUM_N;i++)
-    {
-        Matrix<float>* mat = matrix[i];
-        Node ele(mat->getId(),countingEuclidDist(mat,test));
-        h.insert(ele);
-    }
-    h.printAll();
-    h.printAll2();
+    knn(matrix,test);
 
     delete[] matrix;
 
