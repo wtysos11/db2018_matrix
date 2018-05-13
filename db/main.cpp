@@ -1,10 +1,15 @@
 #include <iostream>
 #include <string>
+#include "fileIO.h"
 #include "matrix.h"
+
+#define NUM_N 60000
+#define NUM_D 784
 using namespace std;
-typedef int Test;
+
 int main(void)
 {
+    /*
     int** test = new int*[2];
     int* x = new int[3];
     x[0]=1,x[1]=2,x[2]=3;
@@ -41,6 +46,16 @@ int main(void)
     }
     delete[] x;
     delete[] y;
-    delete[] test;
+    delete[] test;*/
+    //mnistÊý¾Ý¼¯¶ÁÐ´
+    int n=NUM_N;
+    int d=NUM_D;
+
+    Matrix<float>** matrix = fileIO("mnist",n,d);
+    Matrix<float>* test = matrix[0];
+    cout<<test->getElement(0,0)<<endl;
+    test->printAll();
+    Matrix<float>* last = matrix[n-1];
+    last->printAll();
     return 0;
 }

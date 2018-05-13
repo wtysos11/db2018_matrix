@@ -1,2 +1,9 @@
 db.*
 *.o
+!*.cpp
+!*.c
+!*.h
+!bin
+!bin/*
+mnist
+

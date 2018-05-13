@@ -2,10 +2,18 @@
 #define MATRIX_H
 #include<algorithm>
 #include<memory>
+#include<iostream>
+using namespace std;
 /*
 basic data structure.
 Use row's dependency list to store
 */
+//开头为0时适用，开头为1时注意减1
+int changer(int x,int y,int m,int d)
+{
+    return x*d+y;
+}
+
 template<typename T>
 class Matrix
 {
@@ -13,6 +21,7 @@ private:
     T** element;
     int m;
     int d;
+    int id;
 public:
 
     Matrix<T>()
@@ -53,13 +62,22 @@ public:
             element[i]=rows;
         }
     }
-    /*
-    Matrix(T* pointer,int m,int d)//receive a one-dimensional array
-    Matrix(const Matrix& another)
+    Matrix<T>(T* pointer,int m,int d)//m rows, d cols matrix element in two-dimension
     {
+        this->m=m;
+        this->d=d;
+        element = new T*[m];
+        for(int i=0;i<m;i++)
+        {
+            T* rows = new T[d];
+            for(int j=0;j<d;j++)
+            {
+                rows[j] = pointer[changer(i,j,m,d)];
 
+            }
+            element[i]=rows;
+        }
     }
-    */
     ~Matrix()
     {
         for(int i=0;i<m;i++)
@@ -183,9 +201,28 @@ public:
     {
         return d;
     }
-    T** getElement()
+    void setId(int id)
     {
-        return element;
+        this->id = id;
+    }
+    int getId()
+    {
+        return id;
+    }
+    T getElement(int x,int y)
+    {
+        return element[x][y];
+    }
+    void printAll()
+    {
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<d;j++)
+            {
+                cout<<element[i][j]<<" ";
+            }
+            cout<<endl;
+        }
     }
 };
 
