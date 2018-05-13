@@ -4,16 +4,12 @@
 #include "matrix.h"
 #include <cmath>
 #include "heap.h"
-#include <vector>
-using namespace std;
 
 #define NUM_N 60000
 #define NUM_D 784
 
 using namespace MinHeap;
 
-vector<int> ide;
-int counting = 0;
 
 template<typename T>
 double countingEuclidDist(Matrix<T>* a,Matrix<T>* b)
@@ -34,11 +30,6 @@ double countingEuclidDist(Matrix<T>* a,Matrix<T>* b)
         {
             dist+=(a->getElement(0,i)-b->getElement(0,i))*(a->getElement(0,i)-b->getElement(0,i));
         }
-    }
-
-    if(dist - 0 <0.01)
-    {
-        ide.push_back(a->getId());
     }
 
     return sqrt(dist);
@@ -64,12 +55,9 @@ int main(void)
         h.insert(ele);
     }
     h.printAll();
+    h.printAll2();
 
-    printf("There are %d points the same as the origin point.\n",ide.size());
-    for(unsigned int i=0;i<ide.size();i++)
-    {
-        printf("%d\n",ide[i]);
-    }
+    delete[] matrix;
 
     return 0;
 }
