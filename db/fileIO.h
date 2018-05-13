@@ -30,7 +30,7 @@ Matrix<float>** fileIO(const char* infile, const int n, const int d) {
 		}
 
 		matrix[i] = new Matrix<float>(mem,1,d);
-		matrix[i].setId(i);
+		matrix[i]->setId(i);
 	}
 
     delete[] mem;
