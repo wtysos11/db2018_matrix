@@ -2,8 +2,7 @@
 #define MATRIX_H
 #include<algorithm>
 #include<memory>
-#include<iostream>
-using namespace std;
+#include<cstdio>
 /*
 basic data structure.
 Use row's dependency list to store
@@ -219,9 +218,9 @@ public:
         {
             for(int j=0;j<d;j++)
             {
-                cout<<element[i][j]<<" ";
+                printf("%f ",element[i][j]);
             }
-            cout<<endl;
+            printf("\n");
         }
     }
 };
