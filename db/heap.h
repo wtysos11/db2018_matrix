@@ -1,12 +1,16 @@
 #ifndef HEAP_H
 #define HEAP_H
 #include <cstdio>
+#include <iostream>
+#include <fstream>
+using namespace std;
 //knn's counter
 /*
 It maintains a k min-heap and update when there's something smaller or not enough element in KHeap.
 It only store the matrix's id.
 */
 #define NOT -1
+#define MAX 100000
 #define LeftChild(x) (2*x+1)
 #define RightChild(x) (2*x+2)
 
@@ -60,6 +64,7 @@ struct Node
     }
 };
 
+
 class KHeap
 {
 private:
@@ -80,6 +85,7 @@ public:
             heap[i].id=NOT;
         }
         maximum=0;
+        maxPosition = 0;
     }
     KHeap(KHeap& another)
     {
@@ -91,6 +97,7 @@ public:
             heap[i] = another.heap[i];
         }
         maximum = another.maximum;
+        maxPosition = another.maxPosition;
     }
     ~KHeap()
     {
@@ -103,23 +110,38 @@ public:
         {
             index++;
             heap[index]=element;
+            if(maximum<element.dist)
+            {
+                maximum=element.dist;
+                maxPosition=index;
+            }
+            MinHeapMaintain(index);
         }
         else if(index==k-1 && element.dist<maximum)//when index == k,index can't add. heap[k] is ready for cache.
         {
+            int changeId = maxPosition;
             heap[maxPosition]=element;
+            maximum = element.dist;
+            for(int i=0;i<k;i++)
+            {
+                if(heap[i].dist>maximum)
+                {
+                    maximum = heap[i].dist;
+                    maxPosition = i;
+                }
+            }
+            //cout<<"IN element:"<<element.id<<endl;
+            //this->printAll();
+            MinHeapMaintain(changeId);
+            //cout<<"After that"<<endl;
+            //this->printAll();
         }
         else
         {
             return false;
         }
 
-        if(maximum<element.dist)
-        {
-            maximum=element.dist;
-            maxPosition=index;
-        }
 
-        MinHeapMaintain(index);
         return true;
     }
 
@@ -133,7 +155,11 @@ public:
         {
             if (heap[j] <= temp)//can't swap
                 break;
-
+            //cout<<"change in ["<<j<<"] "<<heap[j].dist<<"and ["<<i<<"] "<<heap[i].dist<<endl;
+            if(j == maxPosition)
+            {
+                maxPosition = i;
+            }
             heap[i] = heap[j];     //把较大的子结点往下移动,替换它的子结点
             i = j;
             j = (i-1)/2;
@@ -141,42 +167,24 @@ public:
         heap[i] = temp;
     }
 
-    void DownMaintain(int index)
+    void DownMaintain(int i)
     {
-        if(LeftChild(index)>=k)//in case out of range
-            return;
-
-        Node lchild = heap[LeftChild(index)];
-        Node rchild;
-
-        if(RightChild(index)<k)//in case out of range
-             rchild= heap[RightChild(index)];
-
-        if(lchild.id==-1)//if there's no element, return
-        {
-            return;
-        }
-
-        //find the smallest element, maintain the min-heap
-        int smallest = index;
-        if(lchild<heap[index])
-            smallest = LeftChild(index);
-
-        if(rchild.id!=-1 && rchild<heap[smallest])
-        {
-            smallest = RightChild(index);
-        }
-
-        //if there's change, swap the element and continue.
-        if(smallest!=index)
-        {
-            Node swaping = heap[index];
-            heap[index] = heap[smallest];
-            heap[smallest] = swaping;
-
+        int l = LeftChild(i), r = RightChild(i);
+        int smallest = i;
+        if (l < k&&heap[l] < heap[i])
+            smallest = l;
+        if (r < k&&heap[r] < heap[smallest])
+            smallest = r;
+        if (smallest != i){
+            Node temp = heap[i];
+            heap[i] = heap[smallest];
+            heap[smallest] = temp;
+            if(i == maxPosition)
+            {
+                maxPosition = smallest;
+            }
             DownMaintain(smallest);
         }
-
     }
 
     Node pop()
@@ -187,7 +195,9 @@ public:
         }
 
         Node top = heap[0];
-        heap[0]=heap[index];
+        //Node maxi(NOT,MAX);
+        //heap[0] = maxi;
+        heap[0] = heap[index];
         index--;
 
         if(index==-1)
@@ -196,8 +206,8 @@ public:
         }
         else
         {
-            DownMaintain(0);
             k--;
+            DownMaintain(0);
             return top;
         }
     }
@@ -212,7 +222,16 @@ public:
         printf("In min-heap, %d nearest neighbour\n",k);
         for(int i=0;i<k;i++)
         {
-            printf("number=%d id=%d dist=%f\n",i,heap[i].id,heap[i].dist);
+            printf("number=%d id=%d dist=%f",i,heap[i].id,heap[i].dist);
+            if(LeftChild(i)<k&&heap[i]>heap[LeftChild(i)])
+            {
+                printf(" Left Child Problem!");
+            }
+            if(RightChild(i)<k&&heap[i]>heap[RightChild(i)])
+            {
+                printf(" Right Child Problem!");
+            }
+            printf("\n");
         }
     }
 
@@ -226,6 +245,26 @@ public:
             printf("number=%d id=%d dist=%f\n",counter++,top.id,top.dist);
         }
     }
+/*
+    void printAll2()
+    {
+        for(int i=0;i<k-1;i++)
+        {
+            for(int j=0;j<k-1-i;j++)
+            {
+                if(heap[j]>heap[j+1])
+                {
+                    Node temp = heap[j];
+                    heap[j] = heap[j+1];
+                    heap[j+1] = temp;
+                }
+            }
+        }
+        for(int i=0;i<k;i++)
+        {
+            printf("number=%d id=%d dist=%f\n",i,heap[i].id,heap[i].dist);
+        }
+    }*/
 };
 }
 #endif // HEAP_H
