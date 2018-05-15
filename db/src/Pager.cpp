@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
-Record::Record(float* row) {
-    matrix = new Matrix<float>(row, 1, DIMENSION);
+Record::Record(float* row, int id) {
+    this->matrix = new Matrix<float>(row, 1, DIMENSION);
+    matrix->setId(id);
 }
+
 
 Record::~Record() {
     if(matrix != NULL) {
@@ -14,7 +16,14 @@ Record::~Record() {
     }
 }
 
+// to do
+// Record::Record(const Record& other) {
+//     Matrix<float>* this->matrix = new Matrix<float>(other.matrix);
+// }
+
+
 void Record::print() {
+    printf("id : %d\n", matrix->getId());
     matrix->printAll();
 }
 
@@ -31,16 +40,17 @@ int Frame::getPageIndex() {
 Frame::Frame(char* buf, int page_index) {
     char* start = buf;
     this->page_index = page_index;
+    float id = 0;
     float* row = (float*)malloc(sizeof(float) * DIMENSION + 1);
     for(int i = 0; i < RECORDS_PER_PAGE; i++) {
-        memcpy((void*)(row), (void*)buf, sizeof(float));
+        memcpy(&id, (void*)buf, sizeof(float));
         buf = buf + sizeof(float);
         // printf("id = %f \n", row[0]);
         for(int j = 0; j < DIMENSION; j++) {
-            memcpy((void*)(row + (j + 1)), buf, sizeof(float));
+            memcpy((void*)(row + j), buf, sizeof(float));
             buf = buf + sizeof(float);    
         }
-        records[i] = new Record(row);
+        records[i] = new Record(row, id);
     }
     if(row != NULL) {
         free(row);
@@ -75,6 +85,10 @@ Frame::~Frame() {
 
 // implement of pager
 Pager::Pager() {
+    // init the frame
+    for(int i = 0; i < FRAME_NUM; i++) {
+        frames[i] = nullptr;
+    }
     // load first 20 pages into frames
     for(int i = 0; i < FRAME_NUM; i++) {
         load(i, i);
@@ -108,15 +122,16 @@ void Pager::load(int page_index, int frame_index) {
     int page_offset = (page_index % PAGES_PER_FILE) * PAGE_SIZE;
     char file_name[20];
     sprintf(file_name, "../old/%d", page_index / PAGES_PER_FILE);
-    printf("src file name : %s\n", file_name);
+    // printf("src file name : %s, page index : %d, frame index : %d\n", file_name, page_index, frame_index);
+    // 先不考虑效率。。每次读都重新打开文件
     FILE* file_in = fopen(file_name, "rb");
     assert(file_in != NULL);
     fseek(file_in, page_offset ,SEEK_SET);
     char* p_page = (char*)malloc(PAGE_SIZE);
     fread((void*)p_page, PAGE_SIZE, 1, file_in);
     if(frames[frame_index] != NULL) {
-       frames[frame_index]->writeBack();
-       free(frames[frame_index]); 
+        frames[frame_index]->writeBack();
+        delete frames[frame_index]; 
     }
     
     frames[frame_index] = new Frame(p_page, page_index);
@@ -124,6 +139,8 @@ void Pager::load(int page_index, int frame_index) {
     if(p_page != NULL) {
         free(p_page);
     }
+
+    fclose(file_in);
 }
 
 void Pager::updateFrames() {

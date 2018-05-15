@@ -28,6 +28,27 @@ public:
         m=0;
         d=0;
     }
+
+    Matrix<T>(const Matrix<T> &other) {
+        this->m = other.m;
+        this->d = other.d;
+        this->id = other.id;
+        T** pointer = other.element;
+
+        //insert new one
+        element = new T*[m];
+        for(int i=0;i<m;i++)
+        {
+            T* rows = new T[d];
+            for(int j=0;j<d;j++)
+            {
+                rows[j] = pointer[i][j];
+            }
+            element[i]=rows;
+        }
+
+    }
+
     Matrix<T>(int m,int d)//m rows, d cols matrix element in two-dimension
     {
         this->m=m;
@@ -85,6 +106,8 @@ public:
         delete[] element;
     }
 
+
+
 //static function
     //return a matrix(m*d) with all zeros
 
@@ -92,16 +115,19 @@ public:
     //opeartor
     Matrix& operator=(const Matrix& other)
     {
+        // why this function never call
         this->m=other.m;
         this->d=other.d;
         T** pointer = other.element;
 
         //delete old one
-        for(int i=0;i<m;i++)
-        {
-            delete[] element[i];
+        if(element != nullptr) {
+            for(int i=0;i<m;i++)
+            {
+                delete[] element[i];
+            }
+            delete[] element;
         }
-        delete[] element;
 
         //insert new one
         element = new T*[m];
@@ -190,12 +216,13 @@ public:
 
 
     //using for debug
-    int getRow()
+    // should be defined as a const member function
+    int getRow() const
     {
         return m;
     }
 
-    int getCol()
+    int getCol() const
     {
         return d;
     }
@@ -203,15 +230,15 @@ public:
     {
         this->id = id;
     }
-    int getId()
+    int getId() const
     {
         return id;
     }
-    T getElement(int x,int y)
+    T getElement(int x,int y) const
     {
         return element[x][y];
     }
-    void printAll()
+    void printAll() const
     {
         for(int i=0;i<m;i++)
         {

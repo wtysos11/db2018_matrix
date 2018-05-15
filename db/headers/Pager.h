@@ -13,7 +13,7 @@
 #define RECORDS_PER_FILE (PAGES_PER_FILE * RECORDS_PER_FILE) 
 
 struct Record {
-    Record(float* row);
+    Record(float* row, int id);
 
     ~Record();
 

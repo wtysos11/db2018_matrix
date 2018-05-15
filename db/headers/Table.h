@@ -6,7 +6,7 @@ class Table {
 private:
     Pager* pager;
 public:
-    Table();
+    Table();    
     // get a pointer to the record according to the id
     // NULL -> no a record with this id
     Record* getRecord(int id);
