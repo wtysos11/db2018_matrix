@@ -80,6 +80,7 @@ public:
             heap[i].id=NOT;
         }
         maximum=0;
+        maxPosition = 0;
     }
     KHeap(KHeap& another)
     {
@@ -91,38 +92,52 @@ public:
             heap[i] = another.heap[i];
         }
         maximum = another.maximum;
+        maxPosition = another.maxPosition;
     }
     ~KHeap()
     {
         delete[] heap;
     }
-
     bool insert(Node element)
     {
         if(index<k-1)
         {
             index++;
             heap[index]=element;
+            if(maximum<element.dist)
+            {
+                maximum=element.dist;
+                maxPosition=index;
+            }
+            MinHeapMaintain(index);
         }
         else if(index==k-1 && element.dist<maximum)//when index == k,index can't add. heap[k] is ready for cache.
         {
+            int changeId = maxPosition;
             heap[maxPosition]=element;
+            maximum = element.dist;
+            for(int i=k/2;i<k;i++)//maximum must be a leaf
+            {
+                if(heap[i].dist>maximum)
+                {
+                    maximum = heap[i].dist;
+                    maxPosition = i;
+                }
+            }
+            //cout<<"IN element:"<<element.id<<endl;
+            //this->printAll();
+            MinHeapMaintain(changeId);
+            //cout<<"After that"<<endl;
+            //this->printAll();
         }
         else
         {
             return false;
         }
 
-        if(maximum<element.dist)
-        {
-            maximum=element.dist;
-            maxPosition=index;
-        }
 
-        MinHeapMaintain(index);
         return true;
     }
-
     void MinHeapMaintain(int index)
     {
         int i,j;
@@ -133,50 +148,35 @@ public:
         {
             if (heap[j] <= temp)//can't swap
                 break;
-
-            heap[i] = heap[j];     //�ѽϴ���ӽ�������ƶ�,�滻�����ӽ��?
+            //cout<<"change in ["<<j<<"] "<<heap[j].dist<<"and ["<<i<<"] "<<heap[i].dist<<endl;
+            if(j == maxPosition)
+            {
+                maxPosition = i;
+            }
+            heap[i] = heap[j];     //把较大的子结点往下移动,替换它的子结点
             i = j;
             j = (i-1)/2;
         }
         heap[i] = temp;
     }
-
-    void DownMaintain(int index)
+    void DownMaintain(int i)
     {
-        if(LeftChild(index)>=k)//in case out of range
-            return;
-
-        Node lchild = heap[LeftChild(index)];
-        Node rchild;
-
-        if(RightChild(index)<k)//in case out of range
-             rchild= heap[RightChild(index)];
-
-        if(lchild.id==-1)//if there's no element, return
-        {
-            return;
-        }
-
-        //find the smallest element, maintain the min-heap
-        int smallest = index;
-        if(lchild<heap[index])
-            smallest = LeftChild(index);
-
-        if(rchild.id!=-1 && rchild<heap[smallest])
-        {
-            smallest = RightChild(index);
-        }
-
-        //if there's change, swap the element and continue.
-        if(smallest!=index)
-        {
-            Node swaping = heap[index];
-            heap[index] = heap[smallest];
-            heap[smallest] = swaping;
-
+        int l = LeftChild(i), r = RightChild(i);
+        int smallest = i;
+        if (l < index&&heap[l] < heap[i])
+            smallest = l;
+        if (r < index&&heap[r] < heap[smallest])
+            smallest = r;
+        if (smallest != i){
+            Node temp = heap[i];
+            heap[i] = heap[smallest];
+            heap[smallest] = temp;
+            if(i == maxPosition)
+            {
+                maxPosition = smallest;
+            }
             DownMaintain(smallest);
         }
-
     }
 
     Node pop()
@@ -187,7 +187,9 @@ public:
         }
 
         Node top = heap[0];
-        heap[0]=heap[index];
+        //Node maxi(NOT,MAX);
+        //heap[0] = maxi;
+        heap[0] = heap[index];
         index--;
 
         if(index==-1)
@@ -197,7 +199,6 @@ public:
         else
         {
             DownMaintain(0);
-            k--;
             return top;
         }
     }
