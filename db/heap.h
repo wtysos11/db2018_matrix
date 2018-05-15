@@ -1,9 +1,6 @@
 #ifndef HEAP_H
 #define HEAP_H
 #include <cstdio>
-#include <iostream>
-#include <fstream>
-using namespace std;
 //knn's counter
 /*
 It maintains a k min-heap and update when there's something smaller or not enough element in KHeap.
@@ -122,7 +119,7 @@ public:
             int changeId = maxPosition;
             heap[maxPosition]=element;
             maximum = element.dist;
-            for(int i=0;i<k;i++)
+            for(int i=k/2;i<k;i++)//maximum must be a leaf
             {
                 if(heap[i].dist>maximum)
                 {
@@ -171,9 +168,9 @@ public:
     {
         int l = LeftChild(i), r = RightChild(i);
         int smallest = i;
-        if (l < k&&heap[l] < heap[i])
+        if (l < index&&heap[l] < heap[i])
             smallest = l;
-        if (r < k&&heap[r] < heap[smallest])
+        if (r < index&&heap[r] < heap[smallest])
             smallest = r;
         if (smallest != i){
             Node temp = heap[i];
@@ -206,7 +203,6 @@ public:
         }
         else
         {
-            k--;
             DownMaintain(0);
             return top;
         }

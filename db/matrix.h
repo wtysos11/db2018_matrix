@@ -211,6 +211,7 @@ public:
     {
         return element[x][y];
     }
+    /*
     void printAll()
     {
         for(int i=0;i<m;i++)
@@ -221,7 +222,7 @@ public:
             }
             printf("\n");
         }
-    }
+    }*/
 };
 
 #endif // MATRIX_H
