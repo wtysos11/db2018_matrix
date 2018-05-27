@@ -12,16 +12,18 @@ Use row's dependency list to store
 template<typename T>
 class Matrix
 {
-private:
+protected:
     T** element;
     int m;
     int d;
     int id;
-    int changer(int x,int y,int m,int d)
+
+public:
+
+    static int changer(int x,int y,int m,int d)
     {
         return x*d+y;
     }
-public:
 
     Matrix<T>()
     {
@@ -227,6 +229,7 @@ public:
     {
         return d;
     }
+	
     void setId(int id)
     {
         this->id = id;
@@ -276,4 +279,5 @@ public:
         cout<<"Gauss average:"<<variance<<endl;
     }
 };
+
 #endif

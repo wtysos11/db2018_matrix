@@ -1,5 +1,6 @@
 #include "../headers/Table.h"
 #include "../headers/Heap.h"
+#include "../headers/SparseMatrix.h"
 #include <assert.h>
 #include <cmath>
 #include <queue>
@@ -136,7 +137,54 @@ Matrix<float> createGaussMatrix(int m,int d)
         }while(isnan(z)||isinf(z));
     }
     Matrix<float> gauss(store,m,d);
+    delete[] store;
     return gauss;
+}
+
+/*
+m*d大小的果蝇哈希投影矩阵，有p概率为1
+*/
+SparseMatrix createFlyMatrix(int m,int d,double p)
+{
+    int y=(int)(p*d);
+    int* store = new int[m*y];
+    for(int i=0;i<m;i++)
+    {
+        int* cache = new int[d];
+        for(int j=0;j<d;j++)
+        {
+            cache[j]=j;
+        }
+
+        for(int j=d;j>y;j--)
+        {
+            int coordinate = rand()%d;
+            if(cache[coordinate]!=-1)
+            {
+                cache[coordinate]=-1;
+            }
+            else
+            {
+                j++;
+            }
+        }
+
+        int coordinate = 0;
+        for(int j=0;j<d;j++)
+        {
+            if(cache[j]==j)
+            {
+                int coor = Matrix<int>::changer(i,coordinate,m,y);
+                store[coor]=j;
+                coordinate++;
+            }
+        }
+
+        delete[] cache;
+    }
+    SparseMatrix ans(store,m,y);
+    delete[] store;
+    return ans;
 }
 
 
@@ -153,6 +201,8 @@ int main(void)
     //knn(matrix,test);
 
     //delete[] matrix;
+    SparseMatrix ans(createFlyMatrix(5,5,0.8));
+    ans.printAll();
 
     return 0;
 }
