@@ -227,6 +227,17 @@ public:
             printf("number=%d id=%d dist=%f\n",counter++,top.id,top.dist);
         }
     }
+
+    //find if the ordered id is in the knn
+    bool checkElement(int orderId)
+    {
+        for(int i=0;i<k;i++)
+        {
+            if(heap[i].id == orderId)
+                return true;
+        }
+        return false;
+    }
 };
 }
 #endif // HEAP_H

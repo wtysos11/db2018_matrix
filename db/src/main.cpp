@@ -6,11 +6,22 @@
 #include <utility>
 #include <vector>
 #include <functional>
+#include <time.h>
+#include "../fileIO.h"
+
+#include <algorithm>
+#include <iostream>
+using namespace std;
 
 #define RECORD_NUM 60000
 #define K_NUM 10
 #define TARGET_RECORD_NUM 20
-// 
+
+#define NUM_N 60000
+#define NUM_D 784
+
+using namespace MinHeap;
+
 double getDistance(const Matrix<float>* t_a, const Matrix<float>* t_b) {
     double res = 0;
     // the fist element of matrix is id
@@ -23,11 +34,112 @@ double getDistance(const Matrix<float>* t_a, const Matrix<float>* t_b) {
     return sqrt(res);
 }
 
+template<typename T>
+double countingEuclidDist(Matrix<T>* a,Matrix<T>* b)
+{
+    if(a->getRow()!=1||b->getRow()!=1||a->getCol()!=b->getCol())
+    {
+        return -1;
+    }
 
+    double dist = 0;
+    for(int i=0;i<a->getCol();i++)
+    {
+        if(a->getElement(0,i)==0&&b->getElement(0,i)==0)
+        {
+            continue;
+        }
+        else
+        {
+            dist+=(a->getElement(0,i)-b->getElement(0,i))*(a->getElement(0,i)-b->getElement(0,i));
+        }
+    }
+
+    return sqrt(dist);
+}
+
+struct cmp1{
+   bool operator() (const Node x,const Node y)
+   {
+       return x>y;
+   }
+};
+
+/*AP函数，对给定的查询和*/
+//接收一个完成knn查询的堆，一个query数组和数组的长度n。注：query数组中存放的是knn的id
+//PS:不能够在Kheap进行pop操作之后再进行，结果不会正确
+double AP(KHeap kheap,int* query,int n)
+{
+    if(n==0)
+        return 0;
+    double sum = 0;
+    double correct = 0;//正确的knn
+    double total = 0;//总数
+    for(int i=0;i<n;i++)
+    {
+        total++;
+        if(kheap.checkElement(query[i]))
+        {
+            correct++;
+            sum += correct/total;
+            cout<<query[i]<<" correct:"<<correct<<" div total:"<<total<<endl;
+        }
+    }
+    return sum/n;
+}
+
+void knn(Matrix<float>** source,Matrix<float>* aim)
+{
+    clock_t clockBegin,clockEnd;
+    clockBegin = clock();
+    KHeap h(10);
+    priority_queue<Node,vector<Node>,cmp1> answer;
+    for(int i=1;i<NUM_N;i++)
+    {
+        Matrix<float>* mat = source[i];
+        Node ele(mat->getId(),countingEuclidDist(mat,aim));
+        h.insert(ele);
+        answer.push(ele);
+    }
+    clockEnd = clock();
+
+    h.printAll2();
+    cout<<"priority answer"<<endl;
+    for(int i=0;i<10;i++)
+    {
+        cout<<"i "<<answer.top().id<<" "<<answer.top().dist<<endl;
+        answer.pop();
+    }
+
+
+
+    printf("spend %d ms\n",clockEnd-clockBegin);
+}
+
+//Matrix<float> createNewtonMatrix
+
+
+int main(void)
+{
+
+    int n=NUM_N;
+    int d=NUM_D;
+
+    Matrix<float>** matrix = fileIO("mnist",n,d);
+    Matrix<float>* test = matrix[0];
+    Matrix<float>* last = matrix[n-1];
+
+    knn(matrix,test);
+
+    delete[] matrix;
+
+    return 0;
+}
+/*
 int main() {
     Table* my_table = new Table();
     MinHeap::KHeap* my_min_heap = new MinHeap::KHeap(K_NUM);
-    
+
     // this should be copy and will never be changed
     // 这个还有一点bug，不过不影响现阶段的使用
     // 如果只是遍历读取记录的话，应该是没问题的
@@ -55,8 +167,8 @@ int main() {
     for(int i = 0; i < K_NUM; i++) {
         pair<double, int> cur = my_que.top();
         my_que.pop();
-        cout << " id: " << cur.second << " distance: " << cur.first << endl;  
+        cout << " id: " << cur.second << " distance: " << cur.first << endl;
     }
 
     my_min_heap->printAll();
-}
+}*/
