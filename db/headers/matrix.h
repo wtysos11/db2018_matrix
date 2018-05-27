@@ -182,6 +182,30 @@ public:
         delete[] ans;
         return mat;
     }
+    /*
+    接收一个列表，返回选取这nodeList中下标的新向量。nodeList必须升序
+    注意：函数不进行检查，请使用的时候自行留意。
+    */
+    Matrix<T> createRandomDispose(int* nodeList,int n)
+    {
+        T* ans = new T[n];
+
+        for(int i=0;i<this->m;i++)
+        {
+            int counting = 0;
+            for(int j=0;j<this->d;j++)
+            {
+               if(nodeList[counting]==j)
+               {
+                   ans[counting] = this->element[i][j];
+                   counting++;
+               }
+            }
+        }
+        Matrix<T> mat(ans,1,n);
+        delete[] ans;
+        return mat;
+    }
 
     //matrix row operation
     T row_sum(int row)

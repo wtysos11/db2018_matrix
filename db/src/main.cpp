@@ -187,6 +187,49 @@ SparseMatrix createFlyMatrix(int m,int d,double p)
     return ans;
 }
 
+/*
+接收一个向量数组origin和元素数量number，已知原有维数n，要求新向量维数k，返回number个新的k维向量
+向量产生方式为随机选取k个下标。
+*/
+Matrix<float>* disposeRandom(Matrix<float>* origin,int number,int n,int k)
+{
+    int* nodeList = new int[k];
+    int* cache = new int[n];
+    for(int i=0;i<n;i++)
+    {
+        cache[i] = i;
+    }
+    for(int i=n;i>k;i--)
+    {
+        int coordinate = rand()%n;
+        if(cache[coordinate]!=-1)
+        {
+            cache[coordinate]=-1;
+        }
+        else
+        {
+            i++;
+        }
+    }
+    int counting = 0;
+    for(int i=0;i<n;i++)
+    {
+        if(cache[i]==i)
+        {
+            nodeList[counting] = i;
+            counting++;
+        }
+    }
+
+    Matrix<float>* ans = new Matrix<float>[n];
+    for(int i=0;i<number;i++)
+    {
+        ans[i] = origin[i].createRandomDispose(nodeList,k);
+    }
+
+    delete[] nodeList;
+    return ans;
+}
 
 int main(void)
 {
@@ -201,8 +244,19 @@ int main(void)
     //knn(matrix,test);
 
     //delete[] matrix;
-    SparseMatrix ans(createFlyMatrix(3,5,0.8));
-    ans.printAll();
+    float* data = new float[5];
+    data[0]=1,data[1]=2,data[2]=3,data[3]=4,data[4]=5;
+
+    Matrix<float>* origin = new Matrix<float>(data,1,5);
+    delete[] data;
+
+    Matrix<float>* newone = disposeRandom(origin,1,5,3);
+    newone->printAll();
+
+    delete origin;
+    delete newone;
+
+
 
     return 0;
 }
