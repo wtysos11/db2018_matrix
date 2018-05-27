@@ -201,7 +201,7 @@ int main(void)
     //knn(matrix,test);
 
     //delete[] matrix;
-    SparseMatrix ans(createFlyMatrix(5,5,0.8));
+    SparseMatrix ans(createFlyMatrix(3,5,0.8));
     ans.printAll();
 
     return 0;
