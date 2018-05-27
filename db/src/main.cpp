@@ -95,7 +95,7 @@ void knn(Matrix<float>** source,Matrix<float>* aim)
 {
     clock_t clockBegin,clockEnd;
     clockBegin = clock();
-    KHeap h(10);
+    KHeap h(10,false);
     priority_queue<Node,vector<Node>,cmp1> answer;
     for(int i=1;i<NUM_N;i++)
     {
@@ -106,6 +106,9 @@ void knn(Matrix<float>** source,Matrix<float>* aim)
     }
     clockEnd = clock();
 
+    cout<<"print"<<endl;
+    h.printAll();
+    cout<<"rank"<<endl;
     h.printAll2();
     cout<<"priority answer"<<endl;
     for(int i=0;i<10;i++)
@@ -237,26 +240,13 @@ int main(void)
     int n=NUM_N;
     int d=NUM_D;
 
-   // Matrix<float>** matrix = fileIO("mnist",n,d);
-   // Matrix<float>* test = matrix[0];
-   // Matrix<float>* last = matrix[n-1];
+    Matrix<float>** matrix = fileIO("mnist",n,d);
+    Matrix<float>* test = matrix[0];
+    Matrix<float>* last = matrix[n-1];
 
-    //knn(matrix,test);
+    knn(matrix,test);
 
-    //delete[] matrix;
-    float* data = new float[5];
-    data[0]=1,data[1]=2,data[2]=3,data[3]=4,data[4]=5;
-
-    Matrix<float>* origin = new Matrix<float>(data,1,5);
-    delete[] data;
-
-    Matrix<float>* newone = disposeRandom(origin,1,5,3);
-    newone->printAll();
-
-    delete origin;
-    delete newone;
-
-
+    delete[] matrix;
 
     return 0;
 }

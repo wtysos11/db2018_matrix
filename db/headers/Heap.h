@@ -9,7 +9,7 @@ It only store the matrix's id.
 #define NOT -1
 #define LeftChild(x) (2*x+1)
 #define RightChild(x) (2*x+2)
-
+#define MAX (2<<30)
 namespace MinHeap
 {
 struct Node
@@ -66,67 +66,98 @@ private:
     Node* heap;//storage pointer
     int k;//number
     int index;//pointer point to the last value
-    double maximum;
-    int maxPosition;
+    double border;
+    int borderPosition;
+	bool flag;//flag为true时是最小堆，flag为flase时是最大堆
 public:
-    KHeap(int k)
+    KHeap(int k,bool flag = true)
     {
-        index=-1;
-        this->k=k;
+        index = -1;
+        this->k = k;
+		this->flag = flag;
         heap = new Node[k];
         for(int i=0;i<k;i++)
         {
             heap[i].dist=NOT;
             heap[i].id=NOT;
         }
-        maximum=0;
-        maxPosition = 0;
+        if(flag)
+            border = 0;
+        else
+            border = MAX;
+        borderPosition = 0;
     }
     KHeap(KHeap& another)
     {
         index = another.index;
         k = another.k;
+		flag = another.flag;
         heap = new Node[k];
         for(int i=0;i<k;i++)
         {
             heap[i] = another.heap[i];
         }
-        maximum = another.maximum;
-        maxPosition = another.maxPosition;
+        border = another.border;
+        borderPosition = another.borderPosition;
     }
     ~KHeap()
     {
         delete[] heap;
     }
+	bool judge(int x,int y)
+	{
+		if(flag)//最小堆
+		{
+			return x<y;
+		}
+		else//最大堆
+		{
+			return x>y;
+		}
+	}
+	bool judge(Node x,Node y)
+	{
+		if(flag)//最小堆
+		{
+			return x<y;
+		}
+		else//最大堆
+		{
+			return x>y;
+		}
+	}
+
     bool insert(Node element)
     {
         if(index<k-1)
         {
             index++;
             heap[index]=element;
-            if(maximum<element.dist)
+			bool borderChange = false;
+
+            if(judge(border,element.dist))
             {
-                maximum=element.dist;
-                maxPosition=index;
+                border=element.dist;
+                borderPosition=index;
             }
-            MinHeapMaintain(index);
+            HeapMaintain(index);
         }
-        else if(index==k-1 && element.dist<maximum)//when index == k,index can't add. heap[k] is ready for cache.
+        else if(index==k-1 && judge(element.dist,border))//when index == k,index can't add. heap[k] is ready for cache.
         {
-            int changeId = maxPosition;
-            heap[maxPosition]=element;
-            maximum = element.dist;
-            for(int i=k/2;i<k;i++)//maximum must be a leaf
+            int changeId = borderPosition;
+            heap[borderPosition]=element;
+            border = element.dist;
+            for(int i=k/2;i<k;i++)//border must be a leaf
             {
-                if(heap[i].dist>maximum)
+                if(judge(border,heap[i].dist))
                 {
-                    maximum = heap[i].dist;
-                    maxPosition = i;
+                    border = heap[i].dist;
+                    borderPosition = i;
                 }
             }
             //cout<<"IN element:"<<element.id<<endl;
             //this->printAll();
-            MinHeapMaintain(changeId);
+            HeapMaintain(changeId);
             //cout<<"After that"<<endl;
             //this->printAll();
         }
@@ -138,7 +169,7 @@ public:
 
         return true;
     }
-    void MinHeapMaintain(int index)
+    void HeapMaintain(int index)
     {
         int i,j;
         Node temp = heap[index];
@@ -146,12 +177,12 @@ public:
         j = (index-1)/2;
         while (j >= 0 && i != 0)
         {
-            if (heap[j] <= temp)//can't swap
+            if (judge(heap[j],temp)||heap[j]==temp)//can't swap
                 break;
             //cout<<"change in ["<<j<<"] "<<heap[j].dist<<"and ["<<i<<"] "<<heap[i].dist<<endl;
-            if(j == maxPosition)
+            if(j == borderPosition)
             {
-                maxPosition = i;
+                borderPosition = i;
             }
             heap[i] = heap[j];     //把较大的子结点往下移动,替换它的子结点
             i = j;
@@ -162,20 +193,20 @@ public:
     void DownMaintain(int i)
     {
         int l = LeftChild(i), r = RightChild(i);
-        int smallest = i;
-        if (l < index&&heap[l] < heap[i])
-            smallest = l;
-        if (r < index&&heap[r] < heap[smallest])
-            smallest = r;
-        if (smallest != i){
+        int changeOne = i;
+        if (l <=index&& judge(heap[l],heap[i]))
+            changeOne = l;
+        if (r <=index&&judge(heap[r],heap[changeOne]))
+            changeOne = r;
+        if (changeOne != i){
             Node temp = heap[i];
-            heap[i] = heap[smallest];
-            heap[smallest] = temp;
-            if(i == maxPosition)
+            heap[i] = heap[changeOne];
+            heap[changeOne] = temp;
+            if(i == borderPosition)
             {
-                maxPosition = smallest;
+                borderPosition = changeOne;
             }
-            DownMaintain(smallest);
+            DownMaintain(changeOne);
         }
     }
 
