@@ -284,6 +284,10 @@ public:
     {
         return element[x][y];
     }
+    void setElement(int x,int y,T ele)
+    {
+        element[x][y] = ele;
+    }
     void printAll() const
     {
         for(int i=0;i<m;i++)

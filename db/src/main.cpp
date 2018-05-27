@@ -234,6 +234,56 @@ Matrix<float>* disposeRandom(Matrix<float>* origin,int number,int n,int k)
     return ans;
 }
 
+/*
+winner take all,只保留最大的前k个分量
+数组origin，数量为number，原有维度n，现在要保留k个分量
+*/
+Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
+{
+    Matrix<float>* newone = new Matrix*<float>[number];
+    for(int i=0;i<number;i++)
+    {
+        newone[i] = origin[i];
+        KHeap heap(k,false);//使用最大堆
+        for(int j=0;j<n;j++)
+        {
+            Node node(j,newone[i].getElement(0,j));
+            heap.insert(node);
+        }
+
+        for(int j=0;j<n;j++)
+        {
+           if(!heap.checkElement(j))
+           {
+               newone[i].setElement(0,j,0);
+           }
+        }
+    }
+    return newone;
+}
+
+/*
+将WTA分量化为0和1两种值
+数组origin，数量为number，原有维度n，现在要保留k个分量
+*/
+Matrix<float>* disposeBinary(Matrix<float>* origin,int number,int n,int k)
+{
+    Matrix<float>* newone = new Matrix*<float>[number];
+    for(int i=0;i<number;i++)
+    {
+        newone[i] = origin[i];
+
+        for(int j=0;j<n;j++)
+        {
+           if(newone[i].getElement(0,j)!=0)
+           {
+               newone[i].setElement(0,j,1);
+           }
+        }
+    }
+    return newone;
+}
+
 int main(void)
 {
     srand((unsigned)time(NULL));
