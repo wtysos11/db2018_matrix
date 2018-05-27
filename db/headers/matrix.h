@@ -3,6 +3,7 @@
 #include<algorithm>
 #include<memory>
 #include<iostream>
+#include <fstream>
 using namespace std;
 /*
 basic data structure.
@@ -248,6 +249,31 @@ public:
             }
             cout<<endl;
         }
+    }
+    //高斯分布检验
+    void checkGauss()
+    {
+        double sum=0;
+        for(int i=0;i<m;i++)
+        {
+            double row = 0;
+            for(int j=0;j<d;j++)
+            {
+                row+=element[i][j];
+            }
+        }
+        sum/=(m*d);
+        cout<<"Gauss average:"<<sum<<endl;
+        double variance=0;
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<d;j++)
+            {
+                variance+=(element[i][j]-sum)*(element[i][j]-sum);
+            }
+        }
+        variance/=(m*d);
+        cout<<"Gauss average:"<<variance<<endl;
     }
 };
 #endif

@@ -1,13 +1,14 @@
 #include "../headers/Table.h"
 #include "../headers/Heap.h"
 #include <assert.h>
-#include <math.h>
+#include <cmath>
 #include <queue>
 #include <utility>
 #include <vector>
 #include <functional>
-#include <time.h>
+#include <ctime>
 #include "../fileIO.h"
+#include <cstdlib>
 
 #include <algorithm>
 #include <iostream>
@@ -19,6 +20,7 @@ using namespace std;
 
 #define NUM_N 60000
 #define NUM_D 784
+#define PI 3.1415926
 
 using namespace MinHeap;
 
@@ -116,22 +118,41 @@ void knn(Matrix<float>** source,Matrix<float>* aim)
     printf("spend %d ms\n",clockEnd-clockBegin);
 }
 
-//Matrix<float> createNewtonMatrix
+//创建一个m*d的高斯矩阵
+
+Matrix<float> createGaussMatrix(int m,int d)
+{
+
+    float* store = new float[m*d];
+    for(int i=0;i<m*d;i++)
+    {
+        float z;
+        do
+        {
+            float u1 = rand()/float(RAND_MAX);
+            float u2 = rand()/float(RAND_MAX);
+            z = sqrt(-2 * log(u1))*cos(2*PI*u2);
+            store[i]=z;
+        }while(isnan(z)||isinf(z));
+    }
+    Matrix<float> gauss(store,m,d);
+    return gauss;
+}
 
 
 int main(void)
 {
-
+    srand((unsigned)time(NULL));
     int n=NUM_N;
     int d=NUM_D;
 
-    Matrix<float>** matrix = fileIO("mnist",n,d);
-    Matrix<float>* test = matrix[0];
-    Matrix<float>* last = matrix[n-1];
+   // Matrix<float>** matrix = fileIO("mnist",n,d);
+   // Matrix<float>* test = matrix[0];
+   // Matrix<float>* last = matrix[n-1];
 
-    knn(matrix,test);
+    //knn(matrix,test);
 
-    delete[] matrix;
+    //delete[] matrix;
 
     return 0;
 }
