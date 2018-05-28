@@ -282,6 +282,24 @@ public:
         }
         return nodeList;
     }
+    Node getElement(int i)
+    {
+        return heap[i];
+    }
+    int getIndex(void)
+    {
+        return index;
+    }
+    /*
+    KHeap合并，可以合并相同flag的KHeap。
+    */
+    void mergeOtherHeap(KHeap& another)
+    {
+        for(int i=0;i<=another.index;i++)
+        {
+            this->insert(another.getElement(i));
+        }
+    }
 };
 }
 #endif // HEAP_H
