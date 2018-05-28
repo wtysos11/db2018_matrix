@@ -166,7 +166,7 @@ public:
     }
     //通过高斯矩阵产生投影，这样行向量可以不用转置直接相乘
     //注：函数不检查合法性，请在调用前确保，不然可能会发生奇怪的问题。
-    Matrix<T> createProjection(Matrix<T> vec)
+    Matrix<T>* createProjection(Matrix<T>* vec)
     {
         T* ans = new T[this->m];
         for(int i=0;i<this->m;i++)
@@ -174,11 +174,11 @@ public:
             ans[i]=0;
             for(int j=0;j<this->d;j++)
             {
-                ans[i]+=this->element[i][j]*vec.getElement(0,j);
+                ans[i]+=this->element[i][j]*vec->getElement(0,j);
             }
         }
 
-        Matrix<T> mat(ans,1,this->m);
+        Matrix<T>* mat = new Matrix<T>(ans,1,this->m);
         delete[] ans;
         return mat;
     }

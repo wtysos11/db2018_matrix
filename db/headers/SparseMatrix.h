@@ -40,7 +40,7 @@ public:
 		;
 	}
 
-	Matrix<float> createProjectionFloat(Matrix<float> vec)
+	Matrix<float>* createProjectionFloat(Matrix<float>* vec)
 	{
 	    float* ans = new float[this->m];
 	    for(int i=0;i<this->m;i++)
@@ -49,15 +49,15 @@ public:
             for(int j=0;j<this->d;j++)
             {
                 int coor = this->element[i][j];
-                ans[i] += vec.getElement(0,coor);//非零项
+                ans[i] += vec->getElement(0,coor);//非零项
             }
         }
 
-        Matrix<float> mat(ans,1,this->m);
+        Matrix<float>* mat = new Matrix<float>(ans,1,this->m);
         delete[] ans;
         return mat;
 	}
-	Matrix<double> createProjectionDouble(Matrix<double> vec)
+	Matrix<double>* createProjectionDouble(Matrix<double>* vec)
 	{
 	    double* ans = new double[this->m];
 	    for(int i=0;i<this->m;i++)
@@ -66,11 +66,11 @@ public:
             for(int j=0;j<this->d;j++)
             {
                 int coor = this->element[i][j];
-                ans[i] += vec.getElement(0,coor);//非零项
+                ans[i] += vec->getElement(0,coor);//非零项
             }
         }
 
-        Matrix<double> mat(ans,1,this->m);
+        Matrix<double>* mat = new Matrix<double>(ans,1,this->m);
         delete[] ans;
         return mat;
 	}

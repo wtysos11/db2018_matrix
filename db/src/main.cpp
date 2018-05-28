@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #define RECORD_NUM 60000
@@ -126,7 +127,6 @@ void knn(Matrix<float>** source,Matrix<float>* aim)
 
 Matrix<float>* createGaussMatrix(int m,int d)
 {
-
     float* store = new float[m*d];
     for(int i=0;i<m*d;i++)
     {
@@ -290,17 +290,80 @@ Matrix<float>** disposeBinary(Matrix<float>** origin,int number,int n,int k)
     return newone;
 }
 
-//void calculateProjection(Matrix<float**>);
+//debug
+void projectionTest(Matrix<float>** matrix)
+{
+    cout<<"test begin:"<<endl;
+    matrix[0]->printAll();
+    matrix[1]->printAll();
+    matrix[NUM_N-1]->printAll();
+}
+
+//测试标准函数，接收一个矩阵数组，返回矩阵数组对于高斯
+//m为原始向量长度，d为一次转换后的向量长度，k为对果蝇矩阵投影后向量继续处理的向量长度
+void calculateProjection(Matrix<float>** matrix,int m,int d,int k)
+{
+    //很多函数要用到的随机数种子，请务必加上
+    srand((unsigned)time(NULL));
+
+    //产生高斯投影矩阵和果蝇投影矩阵
+    Matrix<float>* gaussMatrix = createGaussMatrix(m,d);
+    SparseMatrix* flyMatrix = createFlyMatrix(m,d,0.1);
+
+//向量的高斯投影
+    Matrix<float>** gaussProjection = new Matrix<float>*[NUM_N];
+    for(unsigned int i=0;i<NUM_N;i++)
+    {
+        gaussProjection[i] = gaussMatrix->createProjection(matrix[i]);
+    }
+
+    //向量的果蝇投影
+    Matrix<float>** flyProjection = new Matrix<float>*[NUM_N];
+    for(int i=0;i<NUM_N;i++)
+    {
+        flyProjection[i] = flyMatrix->createProjectionFloat(matrix[i]);
+    }
+
+    Matrix<float>** randomDispose = disposeRandom(flyProjection,NUM_N,d,k);
+    Matrix<float>** wtaDispose = disposeWTA(flyProjection,NUM_N,d,k);
+    Matrix<float>** binaryDispose = disposeRandom(wtaDispose,NUM_N,d,k);
+    cout<<"origin"<<endl;
+projectionTest(matrix);
+cout<<"Gauss Projection"<<endl;
+projectionTest(gaussProjection);
+cout<<"Fly Projection"<<endl;
+projectionTest(flyProjection);
+cout<<"Fly Projection dispose random"<<endl;
+projectionTest(randomDispose);
+cout<<"Fly Projection dispose wta"<<endl;
+projectionTest(wtaDispose);
+cout<<"Fly Projection dispose binary"<<endl;
+projectionTest(binaryDispose);
+//knn测试群
+cout<<"Test for knn!"<<endl;
+    int aimId = NUM_N-1;//knn测试重点
+    cout<<"test origin knn"<<endl;
+    knn(matrix, matrix[aimId]);
+knn(gaussProjection, gaussProjection[aimId]);
+knn(flyProjection, flyProjection[aimId]);
+knn(randomDispose, randomDispose[aimId]);
+knn(wtaDispose, wtaDispose[aimId]);
+knn(binaryDispose, binaryDispose[aimId]);
+
+    delete[] flyProjection;
+    delete[] gaussProjection;
+    delete[] randomDispose;
+    delete[] wtaDispose;
+    delete[] binaryDispose;
+}
 
 int main(void)
 {
-    srand((unsigned)time(NULL));
-    int n=NUM_N;
-    int d=NUM_D;
 
-    Matrix<float>** matrix = fileIO("mnist",n,d);
+
+    Matrix<float>** matrix = fileIO("mnist",NUM_N,NUM_D);
     Matrix<float>* test = matrix[0];
-    Matrix<float>* last = matrix[n-1];
+    Matrix<float>* last = matrix[NUM_N-1];
 
     //knn(matrix,test);
 
