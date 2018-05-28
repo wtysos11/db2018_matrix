@@ -240,7 +240,7 @@ winner take all,只保留最大的前k个分量
 */
 Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
 {
-    Matrix<float>* newone = new Matrix*<float>[number];
+    Matrix<float>* newone = new Matrix<float>[number];
     for(int i=0;i<number;i++)
     {
         newone[i] = origin[i];
@@ -250,6 +250,7 @@ Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
             Node node(j,newone[i].getElement(0,j));
             heap.insert(node);
         }
+        heap.printAll();
 
         for(int j=0;j<n;j++)
         {
@@ -268,17 +269,22 @@ Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
 */
 Matrix<float>* disposeBinary(Matrix<float>* origin,int number,int n,int k)
 {
-    Matrix<float>* newone = new Matrix*<float>[number];
+    Matrix<float>* newone = new Matrix<float>[number];
     for(int i=0;i<number;i++)
     {
         newone[i] = origin[i];
+        int counting = 0;
 
         for(int j=0;j<n;j++)
         {
            if(newone[i].getElement(0,j)!=0)
            {
                newone[i].setElement(0,j,1);
+               counting++;
            }
+
+           if(counting == k)
+               break;
         }
     }
     return newone;
@@ -289,14 +295,27 @@ int main(void)
     srand((unsigned)time(NULL));
     int n=NUM_N;
     int d=NUM_D;
-
+/*
     Matrix<float>** matrix = fileIO("mnist",n,d);
     Matrix<float>* test = matrix[0];
     Matrix<float>* last = matrix[n-1];
 
     knn(matrix,test);
 
-    delete[] matrix;
+    delete[] matrix;*/
+    float* test = new float[5];
+    test[0]=5,test[1]=2,test[2]=3,test[3]=7,test[4]=5;
+    Matrix<float> origin(test,1,5);
+    Matrix<float>* arr = new Matrix<float>[2];
+    arr[0]=origin;
+    test[0]=0,test[1]=1,test[2]=2,test[3]=3,test[4]=4;
+    Matrix<float> orr(test,1,5);
+    Matrix<float> current(test,1,5);
+    arr[1]=current;
+    Matrix<float>* newone=disposeWTA(arr,2,5,3);
+    Matrix<float>* morenewone = disposeBinary(newone,2,5,3);
+    morenewone[0].printAll();
+    morenewone[1].printAll();
 
     return 0;
 }
