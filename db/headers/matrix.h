@@ -16,10 +16,10 @@ protected:
     T** element;
     int m;
     int d;
-    int id;
+
 
 public:
-
+int id;
     static int changer(int x,int y,int m,int d)
     {
         return x*d+y;
@@ -37,6 +37,25 @@ public:
         this->d = other.d;
         this->id = other.id;
         T** pointer = other.element;
+
+        //insert new one
+        element = new T*[m];
+        for(int i=0;i<m;i++)
+        {
+            T* rows = new T[d];
+            for(int j=0;j<d;j++)
+            {
+                rows[j] = pointer[i][j];
+            }
+            element[i]=rows;
+        }
+
+    }
+    Matrix<T>(Matrix<T>* other) {
+        this->m = other->m;
+        this->d = other->d;
+        this->id = other->id;
+        T** pointer = other->element;
 
         //insert new one
         element = new T*[m];
@@ -179,31 +198,33 @@ public:
         }
 
         Matrix<T>* mat = new Matrix<T>(ans,1,this->m);
+        mat->setId(vec->getId());
         delete[] ans;
         return mat;
     }
     /*
-    接收一个列表，返回选取这nodeList中下标的新向量。nodeList必须升序
-    注意：函数不进行检查，请使用的时候自行留意。
+    接收一个列表，返回选取这nodeList中下标的新向量。nodeList必须升序。
+    注意：函数不进行检查，请使用的时候自行留意。!!!只能用于向量
     */
     Matrix<T>* createRandomDispose(int* nodeList,int n)
     {
-        T* ans = new T[n];
+        T* cor = new T[n];
 
-        for(int i=0;i<this->m;i++)
+        for(int i=0;i<this->m;i++)//实际上只有1维的行向量
         {
             int counting = 0;
             for(int j=0;j<this->d;j++)
             {
-               if(nodeList[counting]==j)
+               if(nodeList[counting]==j && counting<this->d)
                {
-                   ans[counting] = this->element[i][j];
+                   cor[counting] = this->element[i][j];
                    counting++;
                }
             }
         }
-        Matrix<T>* mat = new Matrix<T>(ans,1,n);
-        delete[] ans;
+        Matrix<T>* mat = new Matrix<T>(cor,1,n);
+        mat->setId(this->id);
+        delete[] cor;
         return mat;
     }
 

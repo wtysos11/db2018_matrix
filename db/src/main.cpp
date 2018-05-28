@@ -96,7 +96,7 @@ void knn(Matrix<float>** source,Matrix<float>* aim)
 {
     clock_t clockBegin,clockEnd;
     clockBegin = clock();
-    KHeap h(10,false);
+    KHeap h(10,true);
     priority_queue<Node,vector<Node>,cmp1> answer;
     for(int i=1;i<NUM_N;i++)
     {
@@ -224,13 +224,14 @@ Matrix<float>** disposeRandom(Matrix<float>** origin,int number,int n,int k)
         }
     }
 
-    Matrix<float>** ans = new Matrix<float>*[n];
+    Matrix<float>** ans = new Matrix<float>*[number];
     for(int i=0;i<number;i++)
     {
         ans[i] = origin[i]->createRandomDispose(nodeList,k);
     }
 
     delete[] nodeList;
+    delete[] cache;
     return ans;
 }
 
@@ -243,14 +244,13 @@ Matrix<float>** disposeWTA(Matrix<float>** origin,int number,int n,int k)
     Matrix<float>** newone = new Matrix<float>*[number];
     for(int i=0;i<number;i++)
     {
-        newone[i] = origin[i];
+        newone[i] = new Matrix<float>(origin[i]);
         KHeap heap(k,false);//使用最大堆
         for(int j=0;j<n;j++)
         {
             Node node(j,newone[i]->getElement(0,j));
             heap.insert(node);
         }
-        heap.printAll();
 
         for(int j=0;j<n;j++)
         {
@@ -272,7 +272,7 @@ Matrix<float>** disposeBinary(Matrix<float>** origin,int number,int n,int k)
     Matrix<float>** newone = new Matrix<float>*[number];
     for(int i=0;i<number;i++)
     {
-        newone[i] = origin[i];
+        newone[i] = new Matrix<float>(origin[i]);
         int counting = 0;
 
         for(int j=0;j<n;j++)
@@ -303,12 +303,13 @@ void projectionTest(Matrix<float>** matrix)
 //m为原始向量长度，d为一次转换后的向量长度，k为对果蝇矩阵投影后向量继续处理的向量长度
 void calculateProjection(Matrix<float>** matrix,int m,int d,int k)
 {
+    cout<<"After reading"<<endl;
     //很多函数要用到的随机数种子，请务必加上
     srand((unsigned)time(NULL));
 
     //产生高斯投影矩阵和果蝇投影矩阵
-    Matrix<float>* gaussMatrix = createGaussMatrix(m,d);
-    SparseMatrix* flyMatrix = createFlyMatrix(m,d,0.1);
+    Matrix<float>* gaussMatrix = createGaussMatrix(d,m);
+    SparseMatrix* flyMatrix = createFlyMatrix(d,m,0.1);
 
 //向量的高斯投影
     Matrix<float>** gaussProjection = new Matrix<float>*[NUM_N];
@@ -316,6 +317,7 @@ void calculateProjection(Matrix<float>** matrix,int m,int d,int k)
     {
         gaussProjection[i] = gaussMatrix->createProjection(matrix[i]);
     }
+    cout<<"finish gauss projection"<<endl;
 
     //向量的果蝇投影
     Matrix<float>** flyProjection = new Matrix<float>*[NUM_N];
@@ -323,10 +325,11 @@ void calculateProjection(Matrix<float>** matrix,int m,int d,int k)
     {
         flyProjection[i] = flyMatrix->createProjectionFloat(matrix[i]);
     }
+    cout<<"finish fly projection"<<endl;
 
     Matrix<float>** randomDispose = disposeRandom(flyProjection,NUM_N,d,k);
     Matrix<float>** wtaDispose = disposeWTA(flyProjection,NUM_N,d,k);
-    Matrix<float>** binaryDispose = disposeRandom(wtaDispose,NUM_N,d,k);
+    Matrix<float>** binaryDispose = disposeBinary(wtaDispose,NUM_N,d,k);
     cout<<"origin"<<endl;
 projectionTest(matrix);
 cout<<"Gauss Projection"<<endl;
@@ -344,12 +347,25 @@ cout<<"Test for knn!"<<endl;
     int aimId = NUM_N-1;//knn测试重点
     cout<<"test origin knn"<<endl;
     knn(matrix, matrix[aimId]);
+    cout<<"test gauss knn"<<endl;
 knn(gaussProjection, gaussProjection[aimId]);
+cout<<"test flyProjection knn"<<endl;
 knn(flyProjection, flyProjection[aimId]);
+cout<<"test randomDispose knn"<<endl;
 knn(randomDispose, randomDispose[aimId]);
+cout<<"test wtaDispose knn"<<endl;
 knn(wtaDispose, wtaDispose[aimId]);
+cout<<"test binaryDispose knn"<<endl;
 knn(binaryDispose, binaryDispose[aimId]);
 
+for(int i=0;i<NUM_N;i++)
+{
+    delete flyProjection[i];
+    delete gaussProjection[i];
+    delete randomDispose[i];
+    delete wtaDispose[i];
+    delete binaryDispose[i];
+}
     delete[] flyProjection;
     delete[] gaussProjection;
     delete[] randomDispose;
@@ -364,11 +380,14 @@ int main(void)
     Matrix<float>** matrix = fileIO("mnist",NUM_N,NUM_D);
     Matrix<float>* test = matrix[0];
     Matrix<float>* last = matrix[NUM_N-1];
-
+    calculateProjection(matrix,NUM_D,100,16);
     //knn(matrix,test);
 
 
-
+for(int i=0;i<NUM_N;i++)
+{
+    delete matrix[i];
+}
     delete[] matrix;
 
     return 0;

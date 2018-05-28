@@ -54,6 +54,7 @@ public:
         }
 
         Matrix<float>* mat = new Matrix<float>(ans,1,this->m);
+        mat->setId(vec->getId());
         delete[] ans;
         return mat;
 	}
@@ -71,6 +72,7 @@ public:
         }
 
         Matrix<double>* mat = new Matrix<double>(ans,1,this->m);
+        mat->setId(vec->getId());
         delete[] ans;
         return mat;
 	}

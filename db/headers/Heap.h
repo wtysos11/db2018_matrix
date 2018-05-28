@@ -126,6 +126,10 @@ public:
 			return x>y;
 		}
 	}
+	bool getFlag(void)
+	{
+	    return flag;
+	}
 
     bool insert(Node element)
     {
@@ -268,6 +272,15 @@ public:
                 return true;
         }
         return false;
+    }
+    int* output(void)
+    {
+        int* nodeList = new int [k];
+        for(int i=0;i<k;i++)
+        {
+            nodeList[i] = heap[i].id;
+        }
+        return nodeList;
     }
 };
 }
