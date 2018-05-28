@@ -124,7 +124,7 @@ void knn(Matrix<float>** source,Matrix<float>* aim)
 
 //创建一个m*d的高斯矩阵
 
-Matrix<float> createGaussMatrix(int m,int d)
+Matrix<float>* createGaussMatrix(int m,int d)
 {
 
     float* store = new float[m*d];
@@ -139,7 +139,7 @@ Matrix<float> createGaussMatrix(int m,int d)
             store[i]=z;
         }while(isnan(z)||isinf(z));
     }
-    Matrix<float> gauss(store,m,d);
+    Matrix<float>* gauss = new Matrix<float>(store,m,d);
     delete[] store;
     return gauss;
 }
@@ -147,7 +147,7 @@ Matrix<float> createGaussMatrix(int m,int d)
 /*
 m*d大小的果蝇哈希投影矩阵，有p概率为1
 */
-SparseMatrix createFlyMatrix(int m,int d,double p)
+SparseMatrix* createFlyMatrix(int m,int d,double p)
 {
     int y=(int)(p*d);
     int* store = new int[m*y];
@@ -185,7 +185,7 @@ SparseMatrix createFlyMatrix(int m,int d,double p)
 
         delete[] cache;
     }
-    SparseMatrix ans(store,m,y);
+    SparseMatrix* ans = new SparseMatrix(store,m,y);
     delete[] store;
     return ans;
 }
@@ -194,7 +194,7 @@ SparseMatrix createFlyMatrix(int m,int d,double p)
 接收一个向量数组origin和元素数量number，已知原有维数n，要求新向量维数k，返回number个新的k维向量
 向量产生方式为随机选取k个下标。
 */
-Matrix<float>* disposeRandom(Matrix<float>* origin,int number,int n,int k)
+Matrix<float>** disposeRandom(Matrix<float>** origin,int number,int n,int k)
 {
     int* nodeList = new int[k];
     int* cache = new int[n];
@@ -224,10 +224,10 @@ Matrix<float>* disposeRandom(Matrix<float>* origin,int number,int n,int k)
         }
     }
 
-    Matrix<float>* ans = new Matrix<float>[n];
+    Matrix<float>** ans = new Matrix<float>*[n];
     for(int i=0;i<number;i++)
     {
-        ans[i] = origin[i].createRandomDispose(nodeList,k);
+        ans[i] = origin[i]->createRandomDispose(nodeList,k);
     }
 
     delete[] nodeList;
@@ -238,16 +238,16 @@ Matrix<float>* disposeRandom(Matrix<float>* origin,int number,int n,int k)
 winner take all,只保留最大的前k个分量
 数组origin，数量为number，原有维度n，现在要保留k个分量
 */
-Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
+Matrix<float>** disposeWTA(Matrix<float>** origin,int number,int n,int k)
 {
-    Matrix<float>* newone = new Matrix<float>[number];
+    Matrix<float>** newone = new Matrix<float>*[number];
     for(int i=0;i<number;i++)
     {
         newone[i] = origin[i];
         KHeap heap(k,false);//使用最大堆
         for(int j=0;j<n;j++)
         {
-            Node node(j,newone[i].getElement(0,j));
+            Node node(j,newone[i]->getElement(0,j));
             heap.insert(node);
         }
         heap.printAll();
@@ -256,7 +256,7 @@ Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
         {
            if(!heap.checkElement(j))
            {
-               newone[i].setElement(0,j,0);
+               newone[i]->setElement(0,j,0);
            }
         }
     }
@@ -267,9 +267,9 @@ Matrix<float>* disposeWTA(Matrix<float>* origin,int number,int n,int k)
 将WTA分量化为0和1两种值
 数组origin，数量为number，原有维度n，现在要保留k个分量
 */
-Matrix<float>* disposeBinary(Matrix<float>* origin,int number,int n,int k)
+Matrix<float>** disposeBinary(Matrix<float>** origin,int number,int n,int k)
 {
-    Matrix<float>* newone = new Matrix<float>[number];
+    Matrix<float>** newone = new Matrix<float>*[number];
     for(int i=0;i<number;i++)
     {
         newone[i] = origin[i];
@@ -277,9 +277,9 @@ Matrix<float>* disposeBinary(Matrix<float>* origin,int number,int n,int k)
 
         for(int j=0;j<n;j++)
         {
-           if(newone[i].getElement(0,j)!=0)
+           if(newone[i]->getElement(0,j)!=0)
            {
-               newone[i].setElement(0,j,1);
+               newone[i]->setElement(0,j,1);
                counting++;
            }
 
@@ -290,32 +290,23 @@ Matrix<float>* disposeBinary(Matrix<float>* origin,int number,int n,int k)
     return newone;
 }
 
+//void calculateProjection(Matrix<float**>);
+
 int main(void)
 {
     srand((unsigned)time(NULL));
     int n=NUM_N;
     int d=NUM_D;
-/*
+
     Matrix<float>** matrix = fileIO("mnist",n,d);
     Matrix<float>* test = matrix[0];
     Matrix<float>* last = matrix[n-1];
 
-    knn(matrix,test);
+    //knn(matrix,test);
 
-    delete[] matrix;*/
-    float* test = new float[5];
-    test[0]=5,test[1]=2,test[2]=3,test[3]=7,test[4]=5;
-    Matrix<float> origin(test,1,5);
-    Matrix<float>* arr = new Matrix<float>[2];
-    arr[0]=origin;
-    test[0]=0,test[1]=1,test[2]=2,test[3]=3,test[4]=4;
-    Matrix<float> orr(test,1,5);
-    Matrix<float> current(test,1,5);
-    arr[1]=current;
-    Matrix<float>* newone=disposeWTA(arr,2,5,3);
-    Matrix<float>* morenewone = disposeBinary(newone,2,5,3);
-    morenewone[0].printAll();
-    morenewone[1].printAll();
+
+
+    delete[] matrix;
 
     return 0;
 }

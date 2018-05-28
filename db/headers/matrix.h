@@ -186,7 +186,7 @@ public:
     接收一个列表，返回选取这nodeList中下标的新向量。nodeList必须升序
     注意：函数不进行检查，请使用的时候自行留意。
     */
-    Matrix<T> createRandomDispose(int* nodeList,int n)
+    Matrix<T>* createRandomDispose(int* nodeList,int n)
     {
         T* ans = new T[n];
 
@@ -202,7 +202,7 @@ public:
                }
             }
         }
-        Matrix<T> mat(ans,1,n);
+        Matrix<T>* mat = new Matrix<T>(ans,1,n);
         delete[] ans;
         return mat;
     }
